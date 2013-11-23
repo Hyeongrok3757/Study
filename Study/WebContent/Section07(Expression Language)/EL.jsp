@@ -132,10 +132,12 @@
 	//	</taglib>
 	// 3. 톰켓 디렉터리에 설치 ( WEB-INF 아래 아무데나 )
 	// 4. web.xml에 연결( 내부에 선언 )
-	//	<taglib>
-	//		<taglib-uri>/functions.tld</taglib-uri>		-> TLD파일의 식별자
-	//		<taglib-location>/WEB-INF/tlds/functions.tld</taglib-location>		-> TLD파일의 경로명
-	//	</taglib>
+	//	<jsp-config>
+	//		<taglib>
+	//			<taglib-uri>/functions.tld</taglib-uri>		-> TLD파일의 식별자
+	//			<taglib-location>/WEB-INF/tlds/functions.tld</taglib-location>		-> TLD파일의 경로명
+	//		</taglib>
+	//  <jsp-config>
 	// 5. EL함수를 호출
 	// jsp페이지 상단에 <%@taglib prefix="m" uri="/functions.tld" % > 지시자를 선언
 	// ${m:square(4.0)}	-> EL함수이름으로 호출

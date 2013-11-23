@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+	<display-name>Study</display-name>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+	
+	<!-- 
+			! Tomcat7 버전부터 annotation기법을 사용하므로 web.xml을 사용하지 않아도됨. ( 해당 서블릿 클래스 상부에 입력 )( 필요시 사용해도 된다. )
+	
+		@WebServlet(
+		name="servletTest", 
+		urlPatterns={"/fds.do", "/fff.do"},
+		displayName="Study",
+		loadOnStartup=1,
+		initParams={
+		@WebInitParam(value="test1", name="str1"),    // 추출시 서블릿 클래스 메소드내에서 getInitParameter(name)을 사용
+		@WebInitParam(value="test2", name="str2"),
+		@WebInitParam(value="filePath", name="c:\\data\\file\\notice.txt")} // 경로명의 \문자는 두개를 겹쳐써야 함.
+		)
+		@MultipartConfig(maxFileSize= 1024*1024*20, location="c:\\data")
+	
+	 -->
+	
+	
+	<!-- 에러페이지 등록방법 1. 익셉션타입 -->
+	<error-page>
+		<exception-type>java.lang.NumberFormatException</exception-type>
+		<location>/error/NumberFormatError.jsp</location>
+	</error-page>
+	<!-- 에러페이지 등록방법 1. HTTP 응답코드 -->
+	<error-page>
+		<error-code>404</error-code>
+		<location>/error/NotFoundError.jsp</location>
+	</error-page>
+	
+	
+	
+	
+	<!-- 서블릿 등록방법 -->
+	<servlet>
+		<servlet-name>name</servlet-name>
+		<servlet-class>servletname</servlet-class>
+		
+		<init-param>							<!-- 서블릿 초기화 파라미터 : 서블릿의 초기화 작업에 필요한 데이터, 해당 서블릿에서만 접근가능 -->
+			<param-name>filePath</param-name>
+			<param-value>c:\\data\\file\\notice.txt</param-value>  <!-- 경로명의 \문자는 두개를 겹쳐써야 함. -->
+		</init-param>
+		<init-param>
+			<param-name>paramName2</param-name>
+			<param-value>value2</param-value>
+		</init-param>
+		
+		<load-on-startup/>    			<!-- 웹컨테이너가 시작될 때 해당 서블릿이 미리 초기화되게 만든다.(작업시간이 오래걸리는 서블릿에 활용한다) -->
+		
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>name</servlet-name>
+		<url-pattern>/servletname</url-pattern>
+	</servlet-mapping>
+	
+	
+	<!-- JSP 페이지 등록방법 -->
+	<servlet>
+		<servlet-name>jspServlet</servlet-name>
+		<jsp-file>/jsps/testPage.jsp</jsp-file> 	<!-- 웹 애플리케이션 내의 경로명이어야 하며,  반드시 /로 시작하는 경로를 지정한다. -->
+		
+		<init-param>							<!-- jsp 페이지 초기화 파라미터 : 서블릿으로 변환 후 초기화 작업에 필요한 데이터, 해당 jsp 페이지에서만 접근가능 -->
+			<param-name>filePath</param-name>
+			<param-value>c:\\data\\file\\notice.txt</param-value>  <!-- 경로명의 \문자는 두개를 겹쳐써야 함. -->
+		</init-param>
+		
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>jspServlet</servlet-name>
+		<url-pattern>/testPage</url-pattern>  <!-- 접근시 반드시 패턴대로 접근해야 jsp 페이지가 초기화 파라미터를 읽을수 있다. -->
+	</servlet-mapping>
+	
+	
+	<context-param>
+		<param-name>contextData</param-name>
+		<param-value>data</param-value>
+	</context-param>
+	
+	<!-- TLD 등록 -->
+	<!--<taglib>  
+			<taglib-uri>/functions.tld</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/functions.tld</taglib-location>
+		</taglib>
+	-->
+	
+</web-app>

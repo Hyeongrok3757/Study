@@ -21,15 +21,15 @@
 	// 		--> 필터와 래퍼를 같이 사용하면 가능
 	
 	// Wrapper : 포장하는 역할, 웹 브라우저와 웹 컴포넌트 사이를 오가는 요청 메시지와 응답 메시지를 포장한다.
-	// 요청 래퍼 클래스와 응답 래퍼클래스의 두 종류의 래퍼 클래스 형태로 구현된다.
+	// [요청 래퍼 클래스]와 [응답 래퍼 클래스]의 두 종류의 래퍼 클래스 형태로 구현된다.
 	//
-	//												   요청객체			 요청래퍼객체
+	//												   요청객체			 [요청래퍼객체]
 	//		웹 브라우저 -----호출----> 웹 컨테이너 --------------> 필터 --------------> 웹 컴포넌트
-	//												   응답객체			 요청래퍼객체
+	//												   응답객체			 [응답래퍼객체]
 	//
 	// 1. 브라우저 --호출--> 컴포넌트  : 요청객체와 응답객체를 전달. doGet, doPost 메서드의 파라미터 변수나 request, response 내장객체를 통해 서블릿과 JSP페이지로 전달되는 값
 	// 2. 필터가 존재하면 이 두 객체는 필터로 넘겨진다.
-	// 3. 필터가 요청래퍼클래스와 응답래퍼클래스를 가지고 두 객체를 포장한 다음에 웹 컴포넌트로 전달
+	// 3. 필터가 [요청 래퍼 클래스]와 [응답 래퍼 클래스]를 가지고 두 객체를 포장한 다음에 웹 컴포넌트로 전달
 	// 4. 웹 컴포넌트는 새로운 두 객체를 기존의 객체처럼 사용함.
 	
 	
@@ -149,6 +149,132 @@
 	// web.xml파일안의 <filter-mapping>엘리머트의 순서에 따라서 결정된다.
 	// 단, <url-pattern>엘리먼트와 <servlet-name>엘리먼트가 섞여서 사용될 경우에는 <url-pattern>엘리먼트에 해당하는 필터들이 순서대로 먼저 적용되고
 	//		<servlet-name>엘리먼트에 해당하는 필터들이 순서대로 적용된다.
+	
+	
+	
+	
+	//---------------------------------------------------------------------------------------------------------------------------------------------
+	// ▶2. 래퍼 클래스의 작성, 설치, 사용
+	//---------------------------------------------------------------------------------------------------------------------------------------------
+	
+	// 요청 객체를 포장하는 클래스는 HttpServletRequestWrapper 클래스(HttpServletRequest인터페이스를 구현하고 있음)를 상속해야 함.
+	// 응답 객체를 포장하는 클래스는 HttpServletResponseWrapper 클래스(HttpServletResponse인터페이스를 구현하고 있음)를 상속해야 함.
+	// 	--> 따라서 웹 컴포넌트가 [요청 래퍼 객체]와 [응답 래퍼 객체]를 요청객체와 응답객체로 인식할 수 있는 이유를 알 수 있다.
+	//	--> doFilter메서드의 파라미터 타입인 ServletRequest와 ServletResponse는 실제로 브라우저가 전송시 HttpServletRequest와 HttpServletResponse타입이다.
+	//
+	
+	
+	// ★ 요청 래퍼 클래스를 작성하는 방법
+	// ex) public class MyRequestWrapper extends HttpServletRequestWrapper{		--> HttpServletRequestWrapper클래스를 상속한다.
+	//		private HttpServletRequest request;	
+	//		public MyRequestWrapper(HttpServletRequest request) {
+	//				super(request);	
+	//				this.request = request;										--> 생성자로 넘겨받은 요청 객체를 필드에 저장
+	//			}
+	//		}
+	//	☆ super(request)
+	//		--> 슈퍼클래스에 파라미터를 받지 않는 생성자가 없으므로 서브클래스의 생성자 안에서 슈퍼클래스의 생성자 중 하나를 명시적으로 호출해야 하기 때문에 작성.
+	//		--> 자바의 문법에서 슈퍼클래스의 생성자를 호출하는 명령문은 반드시 서브클래스 생성자 안에서 첫 번째 위치에 있어야 함.
+	//
+	// 데이터를 변형하는 코드의 작성
+	//	--> 웹 컴포넌트에서 입력된 데이터를 가져오기 위해서 호출하는 메서드와 똑같은 시그니처의 메서드를 선언해 놓고 그 안에 작성해야 함.
+	//  ex) 웹컴포넌트에서 <form>엘리먼트로 입력된 데이터를 가져올때 getParameter메서드(String파라미터를 받고 String을 리턴)를 사용한다고 하면
+	//		public class MyRequestWrapper extends HttpServletRequestWrapper{		
+	//			...
+	//			public String getParameter(String name){			--> 사용할 메서드와 동일한 시그니처를 작성한다.
+	//				String value = request.getParameter(name);		
+	//				if(value == null) return null;
+	//				return value.toUpperCase();						--> 사용자가 기대하는 작동방식에 맞도록 만들어야 함.
+	//			}
+	//		}
+	//	--> 웹 컴포넌트에서는 요청 객체의 메서드인 줄 알고 호출하게 됨.
+	//
+	//	필터 클래스의 doFilter메서드 내부에서 래퍼 클래스를 생성한 다음 chain.doFilter메서드의 파라미터로 넘겨주어야 한다.
+	//	ex) MyRequestWrapper requestWrapper = new MyRequestWrapper((HttpServletRequest) request);
+	//		chain.doFilter(requestWrapper, response);				--> 요청 래퍼 객체인 rrequestWrapper를 넘겨준다.
+	
+	
+	// ★ 응답 래퍼 클래스를 작성하는 방법
+	// ex) public class MyResponseWrapper extends HttpServletResponseWrapper{		--> HttpServletResponseWrapper클래스를 상속한다.
+	//		private HttpServletResponse response;	
+	//		public MyResponseWrapper(HttpServletResponse response) {
+	//				super(response);	
+	//				this.response = response;										--> 생성자로 넘겨받은 요청 객체를 필드에 저장
+	//			}
+	//		}
+	// 데이터를 변형하는 코드의 작성
+	//		public class MyResponseWrapper extends HttpServletResponseWrapper{		
+	//			...
+	//			public void addCookie(Cookie cookie){
+	//				String name = cookie.getName();
+	//				String value = cookie.getValue();
+	//				String newVlaue = value.toLowerCase();
+	//				Cookie newCookie = new Cookie(name, newValue);
+	//				response.addCookie(newCookie);
+	//			}
+	//		}
+	//	필터 클래스의 doFilter메서드 내부에서 래퍼 클래스를 생성한 다음 chain.doFilter메서드의 파라미터로 넘겨주어야 한다.
+	//	ex) MyResponseWrapper responseWrapper = new MyResponseWrapper((HttpServletResponse) response);
+	//		chain.doFilter(request, responseWrapper);				--> 요청 래퍼 객체인 responseWrapper를 넘겨준다.
+	
+	
+	// ★ 응답 메시지의 본체 내용을 변형하는 래퍼 클래스
+	// 서블릿 클래스에서 HTML코드를 출력하기 위해서는 HttpServletResponse 파라미터에 대해 getWriter메서드를 호출해서 PrintWriter 객체를 구하여
+	// print, printf, println 등의 메서드를 호출했었다. 하지만 매우 많은 타입으로 오버로딩 되어있고 이런 방식으로 변경이 불가능한 경우도 있다.
+	// 따라서 PrintWriter 객체를 통해 출력되는 HTML코드를 모두 모아서 한번에 변형하는 방법을 사용해야함.
+	//
+	// - StringWriter 객체를 사용하여 텍스트 출력을 버퍼에 모아놓고 그 내용을 toString메서드를 호출해서 이용한다.
+	// - StringWriter 객체를 만들어서 PrintWriter 생성자에 파라미터로 넘겨주면 버퍼로 저장 시킬수 있다.
+	// 
+	// 방법
+	// 1. 응답 래퍼 클래스안에 ServletResponse 이터페이스의 getWriter메서드와 동일한 시그니처를 갖는 메서드를 선언
+	// 2. 메서드 내부에서 PrintWriter생성자에 StringWriter객체를 파라미터로 넘겨서 리턴되는 PrintWriter객체를 클래스의 필드로 받는다.
+	//			--> getWriter메서드가 처음 호출시만 객체를 만들어 리턴하고, 그 다음부터는 생성해둔 객체를 리턴하므로 문제 발생의 여지를 없애기 위하여
+	// 3. 메서드 내부에서 StringWriter객체를 생성시 필드로 저장해 두어야 한다.
+	//			--> 나중에 StringWriter객체의 내부 버퍼에 이슨 내용을 한꺼번에 가져오기 위해서(메서드의 지역변수로 쓰면 안됨)
+	// 4. 변형하는 코드는 필터 클래스에서 chain.doFilter메서드를 호출한 다음에 실행되어야 한다.(웹 컴포넌트가 출력한 다음)
+	// 5. 응답 메시지의 변형은 필터클래스 보다는 래퍼클래스에서 해야하는 일이기 때문에 래퍼클래스에 메서드를 만들고 호출한다.
+	// 
+	// ex) 
+	// 응답 래퍼 클래스
+	//		public class MyResponseWrapper extends HttpServletResponseWrapper{		
+	//			...
+	//			PrintWriter newWriter;			--> 메서드 호출마다 재생성을 막기위하여
+	//			StringWriter strWriter;			--> 객체의 내부버퍼에 저장해 두었다가 modifyAndSend메서드에서 가져다 쓰기위해서 메서드의 지역변수로 쓰면 안됨
+	//			
+	//			...
+	//			
+	//			public PrintWriter getWriter() throws IOException {		--> 웹 컴포넌트가 getWriter()를 호출시 작동
+	//				if (newWriter == null) {
+	//					strWriter = new StringWriter();					--> 내부버퍼에 저장하기 위해서 사용할 객체
+	//					newWriter = new PrintWriter(strWriter);			--> 내부버퍼에 저장하기 위해서 사용할 객체
+	//				}
+	//				return newWriter;
+	//			}
+	//			public void modifyAndSend() throws IOException {				--> 필터 클래스에서 내용변환 및 전송을 위하여 호출시 작동
+	//				String content = strWriter.toString();						--> 버퍼에 저장된 내용을 문자열로 리턴
+	//				String newContent = content.replaceAll("강아지", "멍멍이");	--> 전체내용에 변형을 준다.
+	//				PrintWriter writer = response.getWriter();					--> 웹 브라우저로 출력하기 위해 객체를 리턴받음
+	//				writer.print(newContet);									--> 브라우저로 변형된 내용을 출력
+	//			}
+	//		}
+	//
+	// 필터 클래스
+	//	 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	//			MyResponseWrapper responseWrapper = new MyResponseWrapper((HttpServletResponse) response);	--> 응답 래퍼 클래스 생성
+	//			chain.doFilter(request, responseWrapper);													--> 필터체인의 다음번으로 넘긴다.
+	//			responseWrapper.modifyAndSend();															--> 응답내용에 변형을 주고 브라우저로 전송하는 메서드를 호출
+	//		}
+	
+	
+	// 필터와 래퍼가 적용되는 웹 자원
+	//	--> 웹 컴포넌트뿐만 아니라 일반 웹 자원(HTML문서, 이미지파일 등)에도 적용될 수 있다.
+	//	--> 필터와 래퍼의 구현 방법에 따라 어떤 종류의 웹 자원에는 올바르게 적용될 수 없는 경우도 있음.
+	//	--> getWriter메서드를 이용한 방법은 웹 컴포넌트가 생성하는 동적 HTML문서에 대해서는 적용이 가능하지만 정적 HTML 문서는 getWriter메서드를 통해 출력하지
+	//		않기 때문에 적용되지 않는다.
+	
+	
+	
 	
 	
 	

@@ -120,8 +120,35 @@
 	//		--> 타입변환을 통해서 더 다양한 정보를 사용 할 수 있다.
 	
 	
+	// ★ 필터 체인의 방향 바꾸기
+	// 
+	//						호출											로그인 성공 시
+	//	웹 브라우저 ------------------>	사용자의 로그인을 체크하는 필터	------------------------> 로그인한 회원만 쓰는 웹 컴포넌트
+	//													|
+	//													|		로그인을 안 했을 때
+	//													----------------------------------------> 로그인을 유도하는 웹 페이지
+	//
+	//	--> 로그인 여부를 체크하는 필터는 사용자가 로그인하지 않고 웹 컴포넌트를 호출했을 때 본래의 웹 컴포넌트 대신 로그인을 유도하는 웹 컴포넌트로 방향을 바꾼다.
+	//
+	// ex) 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+	//				HttpServletRequest httpRequest = (HttpServletRequest)request;		--> getSession메서드는 HttpServletRequest 인터페이스에 속하므로 타입 변환
+	//				HttpServletResponse httpResponse = (HttpServletResponse)Response;	--> sendRedirect메서드는 HttpServletResponse 인터페이스에 속하므로 타입 변환
+	//				HttpSession session = httpRequest.getSession();						--> 세션확인을 위해서 얻어옴
+	//				if(session == null){
+	//					httpResponse.sendRedirect("로그인페이지 주소");					--> 세션이 null이면 로그인 페이지로 이동
+	//				}
+	//				String id = (String) httpRequest.getAttribute("ID");
+	//				if(id == null){
+	//					httpResponse.sendRedirect("로그인페이지 주소");					--> 요청 정보에 ID의 값이 없다면 로그인 페이지로 이동
+	//				}
+	//				chain.doFilter(reqeust, response);								
+	//		}
 	
 	
+	// ★ 필터체인의 필터 순서가 정해지는 방법
+	// web.xml파일안의 <filter-mapping>엘리머트의 순서에 따라서 결정된다.
+	// 단, <url-pattern>엘리먼트와 <servlet-name>엘리먼트가 섞여서 사용될 경우에는 <url-pattern>엘리먼트에 해당하는 필터들이 순서대로 먼저 적용되고
+	//		<servlet-name>엘리먼트에 해당하는 필터들이 순서대로 적용된다.
 	
 	
 	

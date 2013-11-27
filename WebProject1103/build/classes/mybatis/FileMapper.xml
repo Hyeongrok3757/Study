@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.BlogMapper">
+	<insert id="fileboardinsert" parameterType="FileBoardDto">
+		insert into tblFileboard values(
+			file_num_seq.nextval,
+			#{file_name},
+			#{file_pwd},
+			#{file_size},
+			#{file_uploader},
+			sysdate,
+			#{file_fileimagesrc},
+			0
+		)
+	</insert>
+	
+	<select id="getAllFileList" resultType="FileBoardDto">
+		select * from tblFileBoard order by file_num desc
+	</select>
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.BlogMapper">
+
+
+<select id="noticegetAllList" resultType="NoticeBoardDto">
+		select * from tblNoticeBoard order by nb_num desc
+	</select>
+
+	<insert id="noticeboardinsert" parameterType="NoticeBoardDto">
+		insert into tblNoticeBoard values(
+		nb_num_seq.nextval ,
+		#{nb_subject},
+		#{nb_writer} ,
+		#{nb_content},
+		#{nb_pwd} ,
+		sysdate,
+		0
+		)
+	</insert>
+	<select id="noticeboardDetail" parameterType="String" resultType="NoticeBoardDto">
+		select *from tblNoticeBoard where nb_num=#{nb_num}
+ 	</select>
+	<delete id="noticeboarddelete" parameterType="String">
+		delete from tblNoticeBoard where nb_num=#{nb_num} 
+ 	</delete>
+	<select id="noticeboardsearch" parameterType="NoticeSearchDto" resultType="NoticeBoardDto">
+		select * from tblNoticeBoard where ${search} like #{key}
+	</select>
+	<update id="noticereadCount" parameterType="String">
+		update tblNoticeBoard set nb_readcount=nb_readcount+1 where nb_num=#{nb_num}
+	</update>
+	<update id="noticeboardUpdate" parameterType="NoticeBoardDto">
+		update tblNoticeBoard set
+		nb_subject=#{nb_subject},
+		nb_content=#{nb_content},
+		nb_date=sysdate
+		where nb_num=#{nb_num}
+ 	</update>
+ 	<select id="noticeboardselectlist" parameterType="String" resultType="NoticeBoardDto">
+		select * from (select rownum rnum,nb_num,nb_subject,nb_writer,nb_date,nb_readcount from tblNoticeBoard order by nb_num desc) 
+		where rnum between #{num} and #{num}+14
+	</select>
+
+</mapper>

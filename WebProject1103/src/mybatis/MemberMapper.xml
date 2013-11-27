@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.BlogMapper">
+	<insert id="memberinsert" parameterType="MemberDto">
+		insert into tblMember values(
+		#{m_name},
+		#{m_id},
+		#{m_pwd},
+		#{m_email},
+		#{m_emailAllow},
+		#{m_birthDate},
+		#{m_lunarSolar},
+		#{m_sex},
+		#{m_phone},
+		#{m_cphone},
+		#{m_smsAllow},
+		#{m_addr},
+		#{m_grade}
+		)
+  </insert>
+	<select id="memberSearch" parameterType="MemberSearchDto"
+		resultType="MemberDto">
+		select * from tblMember where m_id=#{id} and m_pwd=#{pwd}
+  </select>
+	<select id="memberStringSearch" parameterType="String"
+		resultType="MemberDto">
+		select * from tblMember where m_id=#{id}
+  </select>
+	<select id="memberIdSearch" parameterType="String" resultType="MemberDto">
+		select * from tblMember where m_id=#{id}
+  </select>
+	<select id="memberEmailSearch" parameterType="String"
+		resultType="MemberDto">
+		select * from tblMember where m_email=#{email}
+  </select>
+	<update id="memberUpdate" parameterType="MemberDto">
+		update tblMember set 
+		m_name=#{m_name}, 
+		m_pwd=#{m_pwd}, 
+		m_email=#{m_email},
+		m_emailAllow=#{m_emailAllow}, 
+		m_birthDate=#{m_birthDate},
+		m_lunarSolar=#{m_lunarSolar},
+		m_sex=#{m_sex}, 
+		m_phone=#{m_phone}, 
+		m_cphone=#{m_cphone}, 
+		m_smsAllow=#{m_smsAllow},
+		m_addr=#{m_addr}, 
+		m_grade=#{m_grade}
+		where m_id=#{m_id}
+  </update>
+</mapper>

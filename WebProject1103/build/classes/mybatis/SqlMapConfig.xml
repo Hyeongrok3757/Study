@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<properties resource="mybatis/db.properties" />    <!-- ★등록 -->
+	<typeAliases>
+		<typeAlias type="freeboard.dto.FreeBoardDto" alias="FreeBoardDto" />   <!-- 별명짓기 memberMapper.xml 에서 줄여서 사용 -->
+		<typeAlias type="freeboard.dto.FreeSearchDto" alias="FreeSearchDto" />
+		<typeAlias type="noticeboard.dto.NoticeBoardDto" alias="NoticeBoardDto"/>
+		<typeAlias type="noticeboard.dto.NoticeSearchDto" alias="NoticeSearchDto"/> 
+		<typeAlias type="member.dto.MemberDto" alias="MemberDto"/>
+		<typeAlias type="member.dto.MemberDto" alias="MemberDto"/>
+		<typeAlias type="member.dto.MemberSearchDto" alias="MemberSearchDto"/>
+		<typeAlias type="fileboard.dto.FileBoardDto" alias="FileBoardDto"/>
+		<typeAlias type="fileboard.dto.FileSearchDto" alias="FileSearchDto"/>
+	</typeAliases>
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver}" />
+				<property name="url" value="${url}" />
+				<property name="username" value="${username}" />
+				<property name="password" value="${password}" />
+			</dataSource>
+		</environment>
+	</environments>
+	<mappers>
+		<mapper resource="mybatis/Mapper.xml" />		<!-- ★Mapper등록(여러개) -->
+		<mapper resource="mybatis/MemberMapper.xml"/>
+		<mapper resource="mybatis/NoticeMapper.xml"/>
+		<mapper resource="mybatis/FileMapper.xml"/>
+	</mappers>
+</configuration>
